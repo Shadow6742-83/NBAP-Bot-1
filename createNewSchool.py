@@ -13,7 +13,7 @@
 import pywikibot
 
 # Etapa 1: obter os dados da escola de um arquivo fonte
-
+# (Prof Rafael organizará essa)
 
 
 
