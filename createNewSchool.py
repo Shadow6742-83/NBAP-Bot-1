@@ -7,6 +7,76 @@
 # 3) Caso não exista, cria o item para a escola, contendo: "rótulo", "descrição", "instância de", "país" e "Código INEP";
 # As três fases são realizadas em loop, até finalizar o arquivo fonte.
 
+# Definindo funções
+
+# Função para adicionar declarações (claims)
+def adicionar_claim(item, prop_id, valor, valor_tipo='wikibase-item'):
+    claim = pywikibot.Claim(repo, prop_id)
+    if valor_tipo == 'wikibase-item':
+        target = pywikibot.ItemPage(repo, valor)
+        claim.setTarget(target)
+    elif valor_tipo == 'string':
+        claim.setTarget(str(valor))
+    else:
+        raise ValueError('Tipo de valor não suportado')
+    item.addClaim(claim, summary=f'Adicionando propriedade {prop_id}')
+
+
+#Essa função é utilizada para formatar o nome das escolas,
+#Existe função nativa, porém tem efeito estranho em "da", "de", "do", "das", "dos", "e".
+def formatar_nome(nome):
+    minusculas = ['da', 'de', 'do', 'das', 'dos', 'e']
+    correcoes = {
+        'educacao': 'Educação',
+        'sao': 'São',  
+        'colegio': 'Colégio',
+        'tecnico': 'Técnico',
+        'tecnologico': 'Tecnológico',
+        'basico': 'Básico',
+        'cei': 'CEI',
+        'cmei': 'CMEI',
+        'pre': 'Pré',
+        'nucleo': 'Núcleo',
+        ' iv': ' IV',
+        'iii': 'III',
+        'ii': 'II',
+        'basica': 'Básica',
+        'instituicao': 'Instituição',
+        'fundacao': 'Fundação',
+        'associacao': 'Associação',
+        'acao': 'Ação',
+        'servico': 'Serviço',
+        'esperanca': 'Esperança',
+        'lapis': 'Lápis',
+        'espaco': 'Espaço',
+        'crianca': 'Criança',
+        'ceu': 'Céu',
+        'pe': 'Pé',
+        'valorizacao': 'Valorização',
+        'comunitario': 'Comunitário'
+    }
+
+    palavras = nome.lower().split()
+    resultado = []
+    ultima_palavra = None
+
+    for i, palavra in enumerate(palavras):
+        if palavra in correcoes:
+            palavra_corrigida = correcoes[palavra]
+        elif palavra in minusculas and i != 0:
+            palavra_corrigida = palavra
+        else:
+            palavra_corrigida = palavra.capitalize()
+
+            # Evitar repetição da mesma palavra consecutiva (inclusive preposições)
+        if palavra_corrigida != ultima_palavra:
+            resultado.append(palavra_corrigida)
+            ultima_palavra = palavra_corrigida
+
+    
+    return ' '.join(resultado)
+
+
 # Início do script
 
 # Vamos trabalhar com pywikibot que é uma biblioteca, logo, precisamos importá-la
@@ -30,60 +100,6 @@ with open(arquivoFonte, newline='', encoding='utf-8') as arquivoCsv:
     # Vamos usar a classe DictReader, da biblioteca csv que importamos na linha 16, para processar nosso arquivo fonte,
     # que está no formato .csv. Cada linha de conteúdo será armazenada como um objeto, com cabeçalho
     leitor = csv.DictReader(arquivoCsv, delimiter=';')
-
-    #Essa função é utilizada para formartar o nome das escolas,
-    #Existe função nativa, porém tem efeito estranho em "da", "de", "do", "das", "dos", "e".
-    def formatar_nome(nome):
-        minusculas = ['da', 'de', 'do', 'das', 'dos', 'e']
-        correcoes = {
-        'educacao': 'Educação',
-        'sao': 'São',  
-        'colegio': 'Colégio',
-        'tecnico': 'Técnico',
-        'tecnologico': 'Tecnológico',
-        'basico': 'Básico',
-        'cei': 'CEI',
-        'cmei': 'CMEI',
-        'pre': 'Pré',
-        'nucleo': 'Núcleo',
-        ' iv': ' IV',
-        'iii': 'III',
-        ' ii': 'II',
-        'basica': 'Básica',
-        'instituicao': 'Instituição',
-        'fundacao': 'Fundação',
-        'associacao': 'Associação',
-        'acao': 'Ação',
-        'servico': 'Serviço',
-        'esperanca': 'Esperança',
-        'lapis': 'Lápis',
-        'espaco': 'Espaço',
-        'crianca': 'Criança',
-        'ceu': 'Céu',
-        'pe': 'Pé',
-        'valorizacao': 'Valorização',
-        'comunitario': 'Comunitário'
-        }
-
-        palavras = nome.lower().split()
-        resultado = []
-        ultima_palavra = None
-
-        for i, palavra in enumerate(palavras):
-            if palavra in correcoes:
-                palavra_corrigida = correcoes[palavra]
-            elif palavra in minusculas and i != 0:
-                palavra_corrigida = palavra
-            else:
-                palavra_corrigida = palavra.capitalize()
-
-            # Evitar repetição da mesma palavra consecutiva (inclusive preposições)
-            if palavra_corrigida != ultima_palavra:
-                resultado.append(palavra_corrigida)
-                ultima_palavra = palavra_corrigida
-
-    
-        return ' '.join(resultado)
     
     # Cada objeto do arquivo (cada linha), será armazenado na variável 'linha', e para cada linha, faremos o seguinte:
     # Importante: esse é o loop de nosso código, onde para cada linha (cada escola) o programa repetirá todas as
@@ -156,18 +172,6 @@ with open(arquivoFonte, newline='', encoding='utf-8') as arquivoCsv:
             # Criar o item com labels e descrições
             #item.editEntity(dados, summary='Criando item para escola brasileira - Censo Escolar 2023')
 
-            # Função auxiliar para adicionar declarações (claims)
-            def adicionar_claim(item, prop_id, valor, valor_tipo='wikibase-item'):
-                claim = pywikibot.Claim(repo, prop_id)
-                if valor_tipo == 'wikibase-item':
-                    target = pywikibot.ItemPage(repo, valor)
-                    claim.setTarget(target)
-                elif valor_tipo == 'string':
-                    claim.setTarget(str(valor))
-                else:
-                    raise ValueError('Tipo de valor não suportado')
-                item.addClaim(claim, summary=f'Adicionando propriedade {prop_id}')
-
             # Adicionar "instância de" (P31) = escola (Q3914)
             #adicionar_claim(item, 'P31', tipo_escola)
 
@@ -177,4 +181,4 @@ with open(arquivoFonte, newline='', encoding='utf-8') as arquivoCsv:
             # Adicionar "Código INEP" (P11704) = código da escola (string)
             #adicionar_claim(item, 'P11704', codigoInep, valor_tipo='string')
 
-            print(f'Item criado para a escola "{nome}" (Código INEP {codigoInep})')
+            print(f'Item criado para a escola {nome} (código INEP: {codigoInep})')
