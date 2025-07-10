@@ -21,7 +21,8 @@ import csv
 # Etapa 1: obter os dados da escola de um arquivo fonte
 
 # Definindo qual é o arquivo fonte (com os dados que iremos importar)
-arquivoFonte = 'microdados_ed_basica_2023_sc_completo.csv'
+arquivoFonte = 'microdados_ed_basica_2023_sc_resumido.csv'
+ #'microdados_ed_basica_2023_sc_completo.csv'
 
 # Precisamos que o programa abra o arquivo fonte, e armazene seu conteúdo em uma variável para que possamos usá-lo
 # Nesse caso, a variável será arquivoCsv
@@ -90,6 +91,7 @@ with open(arquivoFonte, newline='', encoding='utf-8') as arquivoCsv:
     # instruções abaixo:
     for linha in leitor:
 
+        
         # Armazenar os valores em uma novas variáveis, para reutilizar depois, nos passos 2 e 3
         nome = formatar_nome(linha['NO_ENTIDADE'])
         codigoInep = linha['CO_ENTIDADE']
@@ -99,9 +101,9 @@ with open(arquivoFonte, newline='', encoding='utf-8') as arquivoCsv:
         professores = linha['QT_DOC_BAS']
         localizacao = linha['TP_LOCALIZACAO']
         localizacaoDiferenciada = linha['TP_LOCALIZACAO_DIFERENCIADA']        
-
+        
         # Final da Etapa 1
-
+        
         # Etapa 2: realizar a consulta para verificar e existência (ou não) de um item
 
         # Nesta variável, vamos armazenar nossa query
@@ -112,7 +114,7 @@ with open(arquivoFonte, newline='', encoding='utf-8') as arquivoCsv:
         site = pywikibot.Site("wikidata", "wikidata")
         repo = site.data_repository()
 
-        print(nome)
+        #print(nome)
         
         # Checando se existe um item ou não
         if any(pagegenerators.WikidataSPARQLPageGenerator(consulta, site=site)):
@@ -133,7 +135,49 @@ with open(arquivoFonte, newline='', encoding='utf-8') as arquivoCsv:
                     'pt': 'escola localizada em ' + municipio,
                 }
             }
-    
+            #Essa variavel vai nos ajudar a corrigir o bug do valor "Escola"
+
+
+        '''valor = ["Q134739441", "Q134739026", "Q133804953", "Q3914", "Q19855165"]
+        try:
+            tipo_escola
+        except NameError:
+            tipo_escola = None
+            
+        if localizacaoDiferenciada == '1':
+            tipo_escola = valor[0]
+        elif localizacaoDiferenciada == '2':
+            tipo_escola = valor[1]
+        elif localizacaoDiferenciada == '3':
+            tipo_escola = valor[2]
+        elif localizacaoDiferenciada == '0' and localizacao == '1':
+            tipo_escola = valor[3]
+        elif localizacaoDiferenciada == '0' and localizacao == '2':
+            tipo_escola = valor[4]
+
+        print(tipo_escola)'''
+        
+        mapa_tipo_escola = {
+            '1': "Q134739441",
+            '2': "Q134739026",
+            '3': "Q133804953",
+            '0-1': "Q3914",        # localizacaoDiferenciada=0 e localizacao=1
+            '0-2': "Q19855165",    # localizacaoDiferenciada=0 e localizacao=2
+        }
+
+        # Gera chave combinada para os casos especiais
+        chave = (
+            f"{localizacaoDiferenciada}-{localizacao}"
+            if localizacaoDiferenciada == '0'
+            else localizacaoDiferenciada
+        )
+
+        # Busca no dicionário, ou retorna None se não existir
+        tipo_escola = mapa_tipo_escola.get(chave)
+
+        print(tipo_escola)    
+            
+        
             # Criar um novo item vazio
             item = pywikibot.ItemPage(repo)
 
