@@ -48,7 +48,12 @@ with open(arquivoFonte, newline='', encoding='utf-8') as arquivoCsv:
         # Etapa 2: realizar a consulta para verificar e existência (ou não) de um item
 
         # Nesta variável, vamos armazenar nossa query
-        consulta = "desenvolver nossa query aqui..."
+        consulta = "SELECT ?item ?itemLabel  WHERE {
+
+                       ?item wdt:P31 wd:Q3914 .
+                       ?item wdt:P11704 '42021960' .
+   
+        }"
 
         # Para realizar a consulta, podemos utilizar essa função
         generator = pagegenerators.WikidataSPARQLPageGenerator(sparql_query, site=site)
