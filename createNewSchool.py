@@ -9,17 +9,35 @@
 
 # Definindo funções
 
-# Função para adicionar declarações (claims)
-def adicionar_claim(item, prop_id, valor, valor_tipo='wikibase-item'):
-    claim = pywikibot.Claim(repo, prop_id)
+# Função para adicionar declarações
+def adicionar_declaracao(item, prop_id, valor, valor_tipo='wikibase-item'):
+    declaracao = pywikibot.Claim(repo, prop_id)
+
+    # Define o valor da declaração
     if valor_tipo == 'wikibase-item':
         target = pywikibot.ItemPage(repo, valor)
-        claim.setTarget(target)
+        declaracao.setTarget(target)
     elif valor_tipo == 'string':
-        claim.setTarget(str(valor))
+        declaracao.setTarget(str(valor))
     else:
         raise ValueError('Tipo de valor não suportado')
-    item.addClaim(claim, summary=f'Adicionando propriedade {prop_id}')
+
+    # Adiciona a declaração ao item
+    item.addClaim(declaracao, summary=f'Adicionando propriedade {prop_id}')
+
+    # Adiciona sempre a mesma referência (Censo Escolar 2023, com a mesma data de acesso)
+    # Adiciona referência: P248 (afirmado em) → Q133805362
+    ref_fonte = pywikibot.Claim(repo, 'P248')
+    item_fonte = pywikibot.ItemPage(repo, 'Q133805362')
+    ref_fonte.setTarget(item_fonte)
+
+    # Adiciona referência: P813 (data de consulta) → 10/07/2025
+    data_consulta = WbTime(year=2025, month=7, day=10)
+    ref_data = pywikibot.Claim(repo, 'P813')
+    ref_data.setTarget(data_consulta)
+
+    # Anexa as referências na declaração
+    declaracao.addSources([ref_fonte, ref_data])
 
 
 #Essa função é utilizada para formatar o nome das escolas,
@@ -81,8 +99,9 @@ def formatar_nome(nome):
 # Vamos trabalhar com pywikibot que é uma biblioteca, logo, precisamos importá-la
 import pywikibot
 
-#A função PageGenerator interpreta a consulta SPARQL e retorna objetos pywikibot.
-from pywikibot import pagegenerators 
+# A função PageGenerator interpreta a consulta SPARQL e retorna objetos pywikibot; WbTime é necessário
+# para processar datas no formato do Wikidata
+from pywikibot import pagegenerators, WbTime
 
 # Vamos utilizar essa biblioteca para ler o arquivo fonte, que está salvo no formato csv
 import csv
@@ -172,12 +191,12 @@ with open(arquivo_fonte, newline='', encoding='utf-8') as arquivo_csv:
             #item.editEntity(dados, summary='Criando item para escola brasileira - Censo Escolar 2023')
 
             # Adicionar "instância de" (P31) = tipo_escola
-            #adicionar_claim(item, 'P31', tipo_escola)
+            #adicionar_declaracao(item, 'P31', tipo_escola)
 
             # Adicionar "país" (P17) = Brasil (Q155)
-            #adicionar_claim(item, 'P17', 'Q155')
+            #adicionar_declaracao(item, 'P17', 'Q155')
 
             # Adicionar "Código INEP" (P11704) = código da escola (string)
-            #adicionar_claim(item, 'P11704', codigo_inep, valor_tipo='string')
+            #adicionar_declaracao(item, 'P11704', codigo_inep, valor_tipo='string')
 
             print(f'Item criado para a escola {nome} (código INEP: {codigo_inep})')
