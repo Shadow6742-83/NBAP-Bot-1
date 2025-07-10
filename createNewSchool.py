@@ -59,25 +59,22 @@ with open(arquivoFonte, newline='', encoding='utf-8') as arquivoCsv:
         repo = site.data_repository()
 
         
-        # Para realizar a consulta, podemos utilizar essa função
-        generator = pagegenerators.WikidataSPARQLPageGenerator(sparql_query, site=site)
+        # Checando se existe um item ou não
+        if any(pagegenerators.WikidataSPARQLPageGenerator(consulta, site=site)):
+           print("A consulta retornou resultados.")
+        else:
+            print("A consulta não retornou nenhum resultado.")
 
-        # Iterando sobre os itens retornados
-        for item in generator:
-            print(f"{item.title()} - {item.get()['labels'].get('pt', 'Sem rótulo em pt')}")
+            # Etapa 3: caso o item ainda não exista (conforme verificado na etapa 2), criá-lo        
 
-
-
-        # Etapa 3: caso o item ainda não exista (conforme verificado na etapa 2), criá-lo
-
-        # Nesta variável (array), vamos armazenar as informações que gostaríamos de adicionar em nosso item
-        dados = {
-            'labels': {
-                'en': 'Exemplo de rótulo em inglês',
-                'pt': 'Exemplo de rótulo em português',
-            },
-            'descriptions': {
-                'en': 'Exemplo de descrição em inglês',
-                'pt': 'Exemplo de descrição em português',
+            # Nesta variável (array), vamos armazenar as informações que gostaríamos de adicionar em nosso item
+            dados = {
+                    'labels': {
+                    'en': 'Exemplo de rótulo em inglês',
+                    'pt': 'Exemplo de rótulo em português',
+                },
+                    'descriptions': {
+                    'en': 'Exemplo de descrição em inglês',
+                    'pt': 'Exemplo de descrição em português',
+                }
             }
-        }
