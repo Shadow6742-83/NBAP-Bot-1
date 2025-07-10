@@ -78,3 +78,32 @@ with open(arquivoFonte, newline='', encoding='utf-8') as arquivoCsv:
                     'pt': 'Exemplo de descrição em português',
                 }
             }
+    
+# Criar um novo item vazio
+item = pywikibot.ItemPage(repo)
+
+# Criar o item com labels e descrições
+item.editEntity(dados, summary='Criando item para escola brasileira - Censo Escolar 2023')
+
+# Função auxiliar para adicionar declarações (claims)
+def adicionar_claim(item, prop_id, valor, valor_tipo='wikibase-item'):
+    claim = pywikibot.Claim(repo, prop_id)
+    if valor_tipo == 'wikibase-item':
+        target = pywikibot.ItemPage(repo, valor)
+        claim.setTarget(target)
+    elif valor_tipo == 'string':
+        claim.setTarget(str(valor))
+    else:
+        raise ValueError('Tipo de valor não suportado')
+    item.addClaim(claim, summary=f'Adicionando propriedade {prop_id}')
+
+# Adicionar "instância de" (P31) = escola (Q3914)
+adicionar_claim(item, 'P31', 'Q3914')
+
+# Adicionar "país" (P17) = Brasil (Q155)
+adicionar_claim(item, 'P17', 'Q155')
+
+# Adicionar "Código INEP" (P11704) = código da escola (string)
+adicionar_claim(item, 'P11704', codigoInep, valor_tipo='string')
+
+print(f'Item criado para a escola "{nome}" (Código INEP {codigoInep})')
