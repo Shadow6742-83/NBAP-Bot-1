@@ -155,7 +155,7 @@ with open(arquivoFonte, newline='', encoding='utf-8') as arquivoCsv:
         elif localizacaoDiferenciada == '0' and localizacao == '2':
             tipo_escola = valor[4]
 
-        print(tipo_escola)'''
+        '''
         
         mapa_tipo_escola = {
             '1': "Q134739441",
@@ -174,9 +174,6 @@ with open(arquivoFonte, newline='', encoding='utf-8') as arquivoCsv:
 
         # Busca no dicionário, ou retorna None se não existir
         tipo_escola = mapa_tipo_escola.get(chave)
-
-        print(tipo_escola)    
-            
         
             # Criar um novo item vazio
             item = pywikibot.ItemPage(repo)
