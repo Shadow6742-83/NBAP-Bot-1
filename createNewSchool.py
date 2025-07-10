@@ -21,7 +21,7 @@ import csv
 # Etapa 1: obter os dados da escola de um arquivo fonte
 
 # Definindo qual é o arquivo fonte (com os dados que iremos importar)
-arquivoFonte = 'microdados_ed_basica_2023_sc_resumido.csv'
+arquivoFonte = 'microdados_ed_basica_2023_sc_completo.csv'
 
 # Precisamos que o programa abra o arquivo fonte, e armazene seu conteúdo em uma variável para que possamos usá-lo
 # Nesse caso, a variável será arquivoCsv
@@ -41,7 +41,28 @@ with open(arquivoFonte, newline='', encoding='utf-8') as arquivoCsv:
         'colegio': 'Colégio',
         'tecnico': 'Técnico',
         'tecnologico': 'Tecnológico',
-        'basico': 'Básico'
+        'basico': 'Básico',
+        'cei': 'CEI',
+        'cmei': 'CMEI',
+        'pre': 'Pré',
+        'nucleo': 'Núcleo',
+        ' iv': ' IV',
+        'iii': 'III',
+        ' ii': 'II',
+        'basica': 'Básica',
+        'instituicao': 'Instituição',
+        'fundacao': 'Fundação',
+        'associacao': 'Associação',
+        'acao': 'Ação',
+        'servico': 'Serviço',
+        'esperanca': 'Esperança',
+        'lapis': 'Lápis',
+        'espaco': 'Espaço',
+        'crianca': 'Criança',
+        'ceu': 'Céu',
+        'pe': 'Pé',
+        'valorizacao': 'Valorização',
+        'comunitario': 'Comunitário'
         }
 
         palavras = nome.lower().split()
@@ -93,7 +114,7 @@ with open(arquivoFonte, newline='', encoding='utf-8') as arquivoCsv:
 
         print(nome)
         
-         # Checando se existe um item ou não
+        # Checando se existe um item ou não
         if any(pagegenerators.WikidataSPARQLPageGenerator(consulta, site=site)):
            print("A consulta retornou resultados.")
         else:
