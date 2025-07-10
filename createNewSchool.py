@@ -31,13 +31,46 @@ with open(arquivoFonte, newline='', encoding='utf-8') as arquivoCsv:
     # que está no formato .csv. Cada linha de conteúdo será armazenada como um objeto, com cabeçalho
     leitor = csv.DictReader(arquivoCsv, delimiter=';')
 
+    #Essa função é utilizada para formartar o nome das escolas,
+    #Existe função nativa, porém tem efeito estranho em "da", "de", "do", "das", "dos", "e".
+    def formatar_nome(nome):
+        minusculas = ['da', 'de', 'do', 'das', 'dos', 'e']
+        correcoes = {
+        'educacao': 'Educação',
+        'sao': 'São',  
+        'colegio': 'Colégio',
+        'tecnico': 'Técnico',
+        'tecnologico': 'Tecnológico',
+        'basico': 'Básico'
+        }
+
+        palavras = nome.lower().split()
+        resultado = []
+        ultima_palavra = None
+
+        for i, palavra in enumerate(palavras):
+            if palavra in correcoes:
+                palavra_corrigida = correcoes[palavra]
+            elif palavra in minusculas and i != 0:
+                palavra_corrigida = palavra
+            else:
+                palavra_corrigida = palavra.capitalize()
+
+            # Evitar repetição da mesma palavra consecutiva (inclusive preposições)
+            if palavra_corrigida != ultima_palavra:
+                resultado.append(palavra_corrigida)
+                ultima_palavra = palavra_corrigida
+
+    
+        return ' '.join(resultado)
+    
     # Cada objeto do arquivo (cada linha), será armazenado na variável 'linha', e para cada linha, faremos o seguinte:
     # Importante: esse é o loop de nosso código, onde para cada linha (cada escola) o programa repetirá todas as
     # instruções abaixo:
     for linha in leitor:
 
         # Armazenar os valores em uma novas variáveis, para reutilizar depois, nos passos 2 e 3
-        nome = linha['NO_ENTIDADE']
+        nome = formatar_nome(linha['NO_ENTIDADE'])
         codigoInep = linha['CO_ENTIDADE']
         municipio = linha['NO_MUNICIPIO']
         codigoMunicipio = linha['CO_MUNICIPIO']
@@ -58,8 +91,9 @@ with open(arquivoFonte, newline='', encoding='utf-8') as arquivoCsv:
         site = pywikibot.Site("wikidata", "wikidata")
         repo = site.data_repository()
 
+        print(nome)
         
-        # Checando se existe um item ou não
+         # Checando se existe um item ou não
         if any(pagegenerators.WikidataSPARQLPageGenerator(consulta, site=site)):
            print("A consulta retornou resultados.")
         else:
