@@ -51,12 +51,8 @@ with open(arquivoFonte, newline='', encoding='utf-8') as arquivoCsv:
         # Etapa 2: realizar a consulta para verificar e existência (ou não) de um item
 
         # Nesta variável, vamos armazenar nossa query
-        consulta = "SELECT ?item ?itemLabel  WHERE {
+        consulta = "SELECT ?item ?itemLabel  WHERE { ?item wdt:P31 wd:Q3914 . ?item wdt:P11704 '42021960' . }"
 
-                       ?item wdt:P31 wd:Q3914 .
-                       ?item wdt:P11704 '42021960' .
-   
-        }"
 
         # Definindo o site (wikidata)
         site = pywikibot.Site("wikidata", "wikidata")
