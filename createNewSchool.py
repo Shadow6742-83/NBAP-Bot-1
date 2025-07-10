@@ -12,6 +12,9 @@
 # Vamos trabalhar com pywikibot que é uma biblioteca, logo, precisamos importá-la
 import pywikibot
 
+#A função PageGenerator interpreta a consulta SPARQL e retorna objetos pywikibot.
+from pywikibot import pagegenerators 
+
 # Vamos utilizar essa biblioteca para ler o arquivo fonte, que está salvo no formato csv
 import csv
 
@@ -55,10 +58,17 @@ with open(arquivoFonte, newline='', encoding='utf-8') as arquivoCsv:
    
         }"
 
+        # Definindo o site (wikidata)
+        site = pywikibot.Site("wikidata", "wikidata")
+        repo = site.data_repository()
+
+        
         # Para realizar a consulta, podemos utilizar essa função
         generator = pagegenerators.WikidataSPARQLPageGenerator(sparql_query, site=site)
 
-
+        # Iterando sobre os itens retornados
+        for item in generator:
+            print(f"{item.title()} - {item.get()['labels'].get('pt', 'Sem rótulo em pt')}")
 
 
 
