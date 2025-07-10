@@ -68,11 +68,10 @@ def formatar_nome(nome):
         else:
             palavra_corrigida = palavra.capitalize()
 
-            # Evitar repetição da mesma palavra consecutiva (inclusive preposições)
+        # Evitar repetição da mesma palavra consecutiva (inclusive preposições)
         if palavra_corrigida != ultima_palavra:
             resultado.append(palavra_corrigida)
             ultima_palavra = palavra_corrigida
-
     
     return ' '.join(resultado)
 
@@ -91,15 +90,15 @@ import csv
 # Etapa 1: obter os dados da escola de um arquivo fonte
 
 # Definindo qual é o arquivo fonte (com os dados que iremos importar)
-arquivoFonte = 'microdados_ed_basica_2023_sc_resumido.csv'
+arquivo_fonte = 'microdados_ed_basica_2023_sc_resumido.csv'
 
 # Precisamos que o programa abra o arquivo fonte, e armazene seu conteúdo em uma variável para que possamos usá-lo
 # Nesse caso, a variável será arquivoCsv
-with open(arquivoFonte, newline='', encoding='utf-8') as arquivoCsv:
+with open(arquivo_fonte, newline='', encoding='utf-8') as arquivo_csv:
 
     # Vamos usar a classe DictReader, da biblioteca csv que importamos na linha 16, para processar nosso arquivo fonte,
     # que está no formato .csv. Cada linha de conteúdo será armazenada como um objeto, com cabeçalho
-    leitor = csv.DictReader(arquivoCsv, delimiter=';')
+    leitor = csv.DictReader(arquivo_csv, delimiter=';')
     
     # Cada objeto do arquivo (cada linha), será armazenado na variável 'linha', e para cada linha, faremos o seguinte:
     # Importante: esse é o loop de nosso código, onde para cada linha (cada escola) o programa repetirá todas as
@@ -108,20 +107,20 @@ with open(arquivoFonte, newline='', encoding='utf-8') as arquivoCsv:
         
         # Armazenar os valores em uma novas variáveis, para reutilizar depois, nos passos 2 e 3
         nome = formatar_nome(linha['NO_ENTIDADE'])
-        codigoInep = linha['CO_ENTIDADE']
+        codigo_inep = linha['CO_ENTIDADE']
         municipio = linha['NO_MUNICIPIO']
-        codigoMunicipio = linha['CO_MUNICIPIO']
+        codigo_municipio = linha['CO_MUNICIPIO']
         estudantes = linha['QT_MAT_BAS']
         professores = linha['QT_DOC_BAS']
         localizacao = linha['TP_LOCALIZACAO']
-        localizacaoDiferenciada = linha['TP_LOCALIZACAO_DIFERENCIADA']        
+        localizacao_diferenciada = linha['TP_LOCALIZACAO_DIFERENCIADA']        
         
         # Final da Etapa 1
         
         # Etapa 2: realizar a consulta para verificar e existência (ou não) de um item
 
         # Nesta variável, vamos armazenar nossa query
-        consulta = "SELECT ?item ?itemLabel  WHERE { ?item wdt:P31 wd:Q3914 . ?item wdt:P11704 '" + codigoInep + "' . }"
+        consulta = "SELECT ?item ?itemLabel  WHERE { ?item wdt:P31 wd:Q3914 . ?item wdt:P11704 '" + codigo_inep + "' . }"
 
         # Definindo o site (wikidata)
         site = pywikibot.Site("wikidata", "wikidata")
@@ -158,9 +157,9 @@ with open(arquivoFonte, newline='', encoding='utf-8') as arquivoCsv:
 
             # Gera chave combinada para os casos especiais
             chave = (
-                f"{localizacaoDiferenciada}-{localizacao}"
-                if localizacaoDiferenciada == '0'
-                else localizacaoDiferenciada
+                f"{localizacao_diferenciada}-{localizacao}"
+                if localizacao_diferenciada == '0'
+                else localizacao_diferenciada
             )
 
             # Busca no dicionário, ou retorna None se não existir
@@ -172,13 +171,13 @@ with open(arquivoFonte, newline='', encoding='utf-8') as arquivoCsv:
             # Criar o item com labels e descrições
             #item.editEntity(dados, summary='Criando item para escola brasileira - Censo Escolar 2023')
 
-            # Adicionar "instância de" (P31) = escola (Q3914)
+            # Adicionar "instância de" (P31) = tipo_escola
             #adicionar_claim(item, 'P31', tipo_escola)
 
             # Adicionar "país" (P17) = Brasil (Q155)
             #adicionar_claim(item, 'P17', 'Q155')
 
             # Adicionar "Código INEP" (P11704) = código da escola (string)
-            #adicionar_claim(item, 'P11704', codigoInep, valor_tipo='string')
+            #adicionar_claim(item, 'P11704', codigo_inep, valor_tipo='string')
 
-            print(f'Item criado para a escola {nome} (código INEP: {codigoInep})')
+            print(f'Item criado para a escola {nome} (código INEP: {codigo_inep})')
