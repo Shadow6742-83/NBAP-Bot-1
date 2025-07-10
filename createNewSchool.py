@@ -197,7 +197,7 @@ with open(arquivoFonte, newline='', encoding='utf-8') as arquivoCsv:
                 item.addClaim(claim, summary=f'Adicionando propriedade {prop_id}')
 
             # Adicionar "instância de" (P31) = escola (Q3914)
-            adicionar_claim(item, 'P31', 'Q3914')
+            adicionar_claim(item, 'P31', tipo_escola)
 
             # Adicionar "país" (P17) = Brasil (Q155)
             adicionar_claim(item, 'P17', 'Q155')
