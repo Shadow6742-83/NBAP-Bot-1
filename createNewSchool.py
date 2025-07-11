@@ -124,7 +124,7 @@ with open(arquivo_fonte, newline='', encoding='utf-8') as arquivo_csv:
     # instruções abaixo:
     for linha in leitor:
         
-        # Armazenar os valores em uma novas variáveis, para reutilizar depois, nos passos 2 e 3
+        # Armazenar os valores em novas variáveis, para reutilizar depois, nos passos 2 e 3
         nome = formatar_nome(linha['NO_ENTIDADE'])
         codigo_inep = linha['CO_ENTIDADE']
         municipio = linha['NO_MUNICIPIO']
