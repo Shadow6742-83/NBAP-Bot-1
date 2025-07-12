@@ -39,6 +39,45 @@ def adicionar_declaracao(item, prop_id, valor, valor_tipo='wikibase-item'):
     # Anexa as referências na declaração
     declaracao.addSources([ref_fonte, ref_data])
 
+# Função para criar declarações com qualificadores
+def adicionar_declaracao_com_qualificadores(item, prop_id, valor, valor_tipo='wikibase-item', qualificiadores = None):
+    declaracao = pywikibot.Claim(repo, prop_id)
+    
+    # Define o valor da declaração
+    if valor_tipo == 'wikibase-item':
+        target = pywikibot.ItemPage(repo, valor)
+        declaracao.setTarget(target)
+    elif valor_tipo == 'string':
+        declaracao.setTarget(str(valor))
+    else:
+        raise ValueError('Tipo de valor não suportado')
+    
+    # Adiciona a declaração ao item"
+    item.addClaim(declaracao, summary=f'Adicionado {prop_id} -> {valor}')
+
+    # Adiciona os Qualificadores
+    if qualificiadores:
+        for prop_q, val_q in qualificiadores:
+            if val_q is None:
+                continue #pula se o valor não existir
+            qual = pywikibot.Claim(repo, prop_q)
+            qual.setTarget(pywikibot.ItemPage(repo, val_q))
+            declaracao.addQualifier(qual, summary=f'Adicionando qualificador {prop_id} -> {val_q}')
+        
+        # Adiciona sempre a mesma referência (Censo Escolar 2023, com a mesma data de acesso)
+        # Adiciona referência: P248 (afirmado em) → Q133805362
+        ref_fonte = pywikibot.Claim(repo, 'P248')
+        item_fonte = pywikibot.ItemPage(repo, 'Q133805362')
+        ref_fonte.setTarget(item_fonte)
+
+        # Adiciona referência: P813 (data de consulta) → 10/07/2025
+        data_consulta = pywikibot.WbTime(year=2025, month=7, day=10)
+        ref_data = pywikibot.Claim(repo, 'P813')
+        ref_data.setTarget(data_consulta)
+        
+        # Anexa as referências na declaração
+        declaracao.addSources([ref_fonte, ref_data])
+
 
 #Essa função é utilizada para formatar o nome das escolas,
 #Existe função nativa, porém tem efeito estranho em "da", "de", "do", "das", "dos", "e".
@@ -133,6 +172,8 @@ with open(arquivo_fonte, newline='', encoding='utf-8') as arquivo_csv:
         professores = linha['QT_DOC_BAS']
         localizacao = linha['TP_LOCALIZACAO']
         localizacao_diferenciada = linha['TP_LOCALIZACAO_DIFERENCIADA']        
+        queimaLixo = linha['IN_LIXO_QUEIMA']
+        separaLixo = linha['IN_TRATAMENTO_LIXO_SEPARACAO']
         
         # Final da Etapa 1
         
@@ -183,7 +224,19 @@ with open(arquivo_fonte, newline='', encoding='utf-8') as arquivo_csv:
 
             # Busca no dicionário, ou retorna None se não existir
             tipo_escola = mapa_tipo_escola.get(chave)
-        
+            
+            #Verifica se queima ou separa o lixo
+            if queimaLixo == '1':
+                queimaLixo_ID = 'Q133235'
+            else:
+                queimaLixo_ID = None
+
+            if separaLixo == '0':
+                separaLixo_ID = 'Q135276205'
+            elif separaLixo == '1':
+                separaLixo_ID = 'Q931389'
+            
+            
             # Criar um novo item vazio
             #item = pywikibot.ItemPage(repo)
 
@@ -199,4 +252,18 @@ with open(arquivo_fonte, newline='', encoding='utf-8') as arquivo_csv:
             # Adicionar "Código INEP" (P11704) = código da escola (string)
             #adicionar_declaracao(item, 'P11704', codigo_inep, valor_tipo='string')
 
-            print(f'Item criado para a escola {nome} (código INEP: {codigo_inep})')
+            # Adiciona as informações de tratamento de lixo
+            #adicionar_declaracao_com_qualificadores(
+            #    item = item,
+            #    prop_id='P912',        #Instalações
+            #    valor='Q180388',     #Gestão de resíduos sólidos
+            #    valor_tipo='wikibase-item'
+            #    qualificiadores=[
+            #        ('P1552', queimaLixo_ID),
+            #        ('P1552' separaLixo_ID)
+            #
+            #    ]
+            #
+            #
+            #)
+            #print(f'Item criado para a escola {nome} (código INEP: {codigo_inep})')
