@@ -144,10 +144,10 @@ with open(arquivo_fonte, newline='', encoding='utf-8') as arquivo_csv:
         localizacao_diferenciada = linha['TP_LOCALIZACAO_DIFERENCIADA']        
         queimaLixo = linha['IN_LIXO_QUEIMA']
         separaLixo = linha['IN_TRATAMENTO_LIXO_SEPARACAO']
-        semEsgoto = linha['IN_ESGOTO_INEXISTENTE']
-        esgotoFossaC = linha['IN_ESGOTO_FOSSA_COMUM']
-        esgotoPublico = linha['IN_ESGOTO_REDE_PUBLICA']
-        esgotoFossaS = linha['IN_ESGOTO_FOSSA_SEPTICA']
+        esgoto_inexistente = linha['IN_ESGOTO_INEXISTENTE']
+        esgoto_fossa_comum = linha['IN_ESGOTO_FOSSA_COMUM']
+        esgoto_fossa_septica = linha['IN_ESGOTO_FOSSA_SEPTICA']
+        esgoto_rede = linha['IN_ESGOTO_REDE_PUBLICA']
         
         # Final da Etapa 1
         
@@ -210,24 +210,25 @@ with open(arquivo_fonte, newline='', encoding='utf-8') as arquivo_csv:
                 separaLixo_ID = 'Q931389'
             else:
                 separaLixo_ID = None
-            
-            if semEsgoto == '1':
-                existeEsgotoProp = 'P6477'
-                
-            elif semEsgoto == '0':
-                existeEsgotoProp = 'P912'
 
-            else:
-                existeEsgotoProp = None
-
-            tipos_esgotos = []
+            esgoto_fossa_comum_ID = None
+            esgoto_fossa_septica_ID = None
+            esgoto_rede_ID = None    
             
-            if esgotoFossaC == '1':
-                tipos_esgotos.append('Q135336657')
-            if esgotoPublico == '1':
-                tipos_esgotos.append('Q156849')
-            if esgotoFossaS == '1':
-                tipos_esgotos.append('Q386300')
+            if esgoto_inexistente == '1':
+                esgoto_prop = 'P6477'
+
+            elif esgoto_inexistente == '0':
+                esgoto_prop = 'P912'
+            
+                if esgoto_fossa_comum == '1':
+                    esgoto_fossa_comum_ID = 'Q135336657'
+
+                if esgoto_fossa_septica== '1':
+                    esgoto_fossa_septica_ID = 'Q386300'
+
+                if esgoto_rede == '1':
+                    esgoto_rede_ID = 'Q156849'
     
             # Criar um novo item vazio
             #item = pywikibot.ItemPage(repo)
@@ -251,17 +252,19 @@ with open(arquivo_fonte, newline='', encoding='utf-8') as arquivo_csv:
             #    valor='Q180388',     #Gestão de resíduos sólidos
             #    qualificadores=[
             #        ('P1552', queimaLixo_ID),
-            #        ('P1552', separaLixo_ID),
-            #        (esgotoProp, esgoto_ID)
-            
+            #        ('P1552', separaLixo_ID)
             #    ]
             #)
 
             # Adiciona as informações de Esgoto
             #adicionar_declaracao(
             #    item = item,
-            #    prop_id = existeEsgotoProp,
+            #    prop_id = esgoto_prop,
             #    valor = 'Q20127660',
-            #    qualificadores = [('P1552', tipos_esgotos)]
+            #    qualificadores=[
+            #        ('P1552', esgoto_fossa_comum_ID),
+            #        ('P1552', esgoto_fossa_septica_ID),
+            #        ('P1552', esgoto_rede_ID)
+            #    ]
             #)
             #print(f'Item criado para a escola {nome} (código INEP: {codigo_inep})')
