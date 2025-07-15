@@ -142,8 +142,8 @@ with open(arquivo_fonte, newline='', encoding='utf-8') as arquivo_csv:
         professores = linha['QT_DOC_BAS']
         localizacao = linha['TP_LOCALIZACAO']
         localizacao_diferenciada = linha['TP_LOCALIZACAO_DIFERENCIADA']        
-        queimaLixo = linha['IN_LIXO_QUEIMA']
-        separaLixo = linha['IN_TRATAMENTO_LIXO_SEPARACAO']
+        queima_lixo = linha['IN_LIXO_QUEIMA']
+        separa_lixo = linha['IN_TRATAMENTO_LIXO_SEPARACAO']
         esgoto_inexistente = linha['IN_ESGOTO_INEXISTENTE']
         esgoto_fossa_comum = linha['IN_ESGOTO_FOSSA_COMUM']
         esgoto_fossa_septica = linha['IN_ESGOTO_FOSSA_SEPTICA']
@@ -199,17 +199,17 @@ with open(arquivo_fonte, newline='', encoding='utf-8') as arquivo_csv:
             tipo_escola = mapa_tipo_escola.get(chave)
             
             #Verifica se queima ou separa o lixo
-            if queimaLixo == '1':
-                queimaLixo_ID = 'Q133235'
+            if queima_lixo == '1':
+                queima_lixo_ID = 'Q133235'
             else:
-                queimaLixo_ID = None
+                queima_lixo_ID = None
 
-            if separaLixo == '0':
-                separaLixo_ID = 'Q135276205'
-            elif separaLixo == '1':
-                separaLixo_ID = 'Q931389'
+            if separa_lixo == '0':
+                separa_lixo_ID = 'Q135276205'
+            elif separa_lixo == '1':
+                separa_lixo_ID = 'Q931389'
             else:
-                separaLixo_ID = None
+                separa_lixo_ID = None
 
             esgoto_fossa_comum_ID = None
             esgoto_fossa_septica_ID = None
@@ -251,8 +251,8 @@ with open(arquivo_fonte, newline='', encoding='utf-8') as arquivo_csv:
             #    prop_id='P912',      #Instalações
             #    valor='Q180388',     #Gestão de resíduos sólidos
             #    qualificadores=[
-            #        ('P1552', queimaLixo_ID),
-            #        ('P1552', separaLixo_ID)
+            #        ('P1552', queima_lixo_ID),
+            #        ('P1552', separa_lixo_ID)
             #    ]
             #)
 
