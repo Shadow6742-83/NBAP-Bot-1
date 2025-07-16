@@ -274,6 +274,10 @@ with open(arquivo_fonte, newline='', encoding='utf-8') as arquivo_csv:
             # Criar o item com labels e descrições
             #item.editEntity(dados, summary='Criando item para escola brasileira - Censo Escolar 2023')
 
+            # Adicionar município (P131), se encontrado
+            #if municipio_ID:
+            #    adicionar_declaracao(item, 'P131', municipio_ID)
+
             # Adicionar "instância de" (P31) = tipo_escola
             #adicionar_declaracao(item, 'P31', tipo_escola)
 
