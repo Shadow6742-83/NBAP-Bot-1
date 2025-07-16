@@ -121,6 +121,10 @@ import csv
 # Definindo qual é o arquivo fonte (com os dados que iremos importar)
 arquivo_fonte = 'microdados_ed_basica_2023_sc_resumido.csv'
 
+# Definindo o site (wikidata)
+site = pywikibot.Site("wikidata", "wikidata")
+repo = site.data_repository()
+site.user_agent = "NBAP 0.8"
 # Precisamos que o programa abra o arquivo fonte, e armazene seu conteúdo em uma variável para que possamos usá-lo
 # Nesse caso, a variável será arquivoCsv
 with open(arquivo_fonte, newline='', encoding='utf-8') as arquivo_csv:
@@ -161,36 +165,38 @@ with open(arquivo_fonte, newline='', encoding='utf-8') as arquivo_csv:
         consulta = "SELECT ?item ?itemLabel  WHERE { ?item wdt:P31 wd:Q3914 . ?item wdt:P11704 '" + codigo_inep + "' . }"
         consulta_municipio = "select ?item where{ ?item wdt:P1585 '"+ codigo_municipio +"'  . }"
 
-        
- 
-                
-        # Definindo o site (wikidata)
-        site = pywikibot.Site("wikidata", "wikidata")
-        repo = site.data_repository()
 
-        municipioItem = pagegenerators.WikidataSPARQLPageGenerator(consulta_municipio,site=site)
+        municipio_item = pagegenerators.WikidataSPARQLPageGenerator(query=consulta_municipio,site=site)
+        
+        municipio_ID = next(iter(municipio_item), None)
+        
         # Checando se existe um item ou não
-        if any(pagegenerators.WikidataSPARQLPageGenerator(consulta, site=site)):
-           print(f"A escola {nome} já existe no Wikidata. Prosseguindo para a próxima.")
+        
+        if any(pagegenerators.WikidataSPARQLPageGenerator(query=consulta, site=site)):
+            print(f"A escola {nome} já existe no Wikidata. Prosseguindo para a próxima.")
         else:
             print(f"A escola {nome} ainda não existe no Wikidata. Prosseguindo para criação do item.")
-
             
-            # Etapa 3: caso o item ainda não exista (conforme verificado na etapa 2), criá-lo        
-
-            # Nesta variável (array), vamos armazenar as informações que gostaríamos de adicionar em nosso item
+            if municipio_ID:
+                print("Item encontrado para municipio:", municipio_ID)
+            else:
+                print("Nenhum item encontrado para o código:", codigo_municipio)
+            
+                # Etapa 3: caso o item ainda não exista (conforme verificado na etapa 2), criá-lo        
+                
+                # Nesta variável (array), vamos armazenar as informações que gostaríamos de adicionar em nosso item
             dados = {
-                    'labels': {
-                    'en':  nome,
-                    'pt':  nome ,
-                },
-                    'descriptions': {
-                    'en': 'school located in ' + municipio,
-                    'pt': 'escola localizada em ' + municipio,
+                'labels': {
+                'en':  nome,
+                'pt':  nome ,
+            },
+                'descriptions': {
+                'en': 'school located in ' + municipio,
+                'pt': 'escola localizada em ' + municipio,
                 }
             }
-
-            #Essa variavel vai nos ajudar a corrigir o bug do valor "Escola"        
+    
+                #Essa variavel vai nos ajudar a corrigir o bug do valor "Escola"        
             mapa_tipo_escola = {
                 '1': "Q134739441",
                 '2': "Q134739026",
@@ -198,70 +204,70 @@ with open(arquivo_fonte, newline='', encoding='utf-8') as arquivo_csv:
                 '0-1': "Q3914",        # localizacaoDiferenciada=0 e localizacao=1
                 '0-2': "Q19855165",    # localizacaoDiferenciada=0 e localizacao=2
             }
-
-            # Gera chave combinada para os casos especiais
+    
+                # Gera chave combinada para os casos especiais
             chave = (
                 f"{localizacao_diferenciada}-{localizacao}"
                 if localizacao_diferenciada == '0'
                 else localizacao_diferenciada
             )
-
-            # Busca no dicionário, ou retorna None se não existir
+    
+                # Busca no dicionário, ou retorna None se não existir
             tipo_escola = mapa_tipo_escola.get(chave)
-            
-            #Verifica se queima ou separa o lixo
+                
+                #Verifica se queima ou separa o lixo
             if queima_lixo == '1':
                 queima_lixo_ID = 'Q133235'
             else:
                 queima_lixo_ID = None
-
+    
             if separa_lixo == '0':
                 separa_lixo_ID = 'Q135276205'
             elif separa_lixo == '1':
                 separa_lixo_ID = 'Q931389'
             else:
                 separa_lixo_ID = None
-
+    
             esgoto_fossa_comum_ID = None
             esgoto_fossa_septica_ID = None
             esgoto_rede_ID = None    
-            
+                
             if esgoto_inexistente == '1':
                 esgoto_prop = 'P6477'
-
+    
             elif esgoto_inexistente == '0':
                 esgoto_prop = 'P912'
-            
+                
                 if esgoto_fossa_comum == '1':
                     esgoto_fossa_comum_ID = 'Q135336657'
-
+    
                 if esgoto_fossa_septica== '1':
                     esgoto_fossa_septica_ID = 'Q386300'
-
+    
                 if esgoto_rede == '1':
                     esgoto_rede_ID = 'Q156849'
-                    
-
+                        
+    
             energia_publica_ID = None
             energia_gerador_ID = None
             energia_renovavel_ID = None
-            
+                
             if energia_inexistente == '1':
                 energia_prop = 'P6477'
-
+    
             elif energia_inexistente == '0':
                 energia_prop = 'P912'
-
+    
                 if energia_publica == '1':
                     energia_publica_ID = 'Q1096907'
-                
+                    
                 if energia_gerador == '1':
                     energia_gerador_ID = 'Q135343942'
-
+    
                 if energia_renovavel == '1':
                     energia_renovavel_ID = 'Q12705'
                 
-            print(F"Nome: {nome}, Tipos de energia: {energia_publica_ID}, {energia_gerador_ID}, {energia_renovavel_ID}.")
+            
             # Criar um novo item vazio
             #item = pywikibot.ItemPage(repo)
 
