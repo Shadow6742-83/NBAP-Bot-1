@@ -112,7 +112,6 @@ import pywikibot
 # para processar datas no formato do Wikidata
 from pywikibot import pagegenerators, WbTime
 
-
 # Vamos utilizar essa biblioteca para ler o arquivo fonte, que está salvo no formato csv
 import csv
 
@@ -163,12 +162,6 @@ with open(arquivo_fonte, newline='', encoding='utf-8') as arquivo_csv:
 
         # Nesta variável, vamos armazenar nossa query
         consulta = "SELECT ?item ?itemLabel  WHERE { ?item wdt:P31 wd:Q3914 . ?item wdt:P11704 '" + codigo_inep + "' . }"
-        consulta_municipio = "select ?item where{ ?item wdt:P1585 '"+ codigo_municipio +"'  . }"
-
-
-        municipio_item = pagegenerators.WikidataSPARQLPageGenerator(query=consulta_municipio,site=site)
-        
-        municipio_ID = next(iter(municipio_item), None)
         
         # Checando se existe um item ou não
         
@@ -177,14 +170,17 @@ with open(arquivo_fonte, newline='', encoding='utf-8') as arquivo_csv:
         else:
             print(f"A escola {nome} ainda não existe no Wikidata. Prosseguindo para criação do item.")
             
-            if municipio_ID:
-                print("Item encontrado para municipio:", municipio_ID)
-            else:
-                print("Nenhum item encontrado para o código:", codigo_municipio)
-            
-                # Etapa 3: caso o item ainda não exista (conforme verificado na etapa 2), criá-lo        
+            consulta_municipio = "select ?item where{ ?item wdt:P1585 '"+ codigo_municipio +"'  . }"
+
+            municipio_item = pagegenerators.WikidataSPARQLPageGenerator(query=consulta_municipio,site=site)
+        
+            municipio_ID = str(next(iter(municipio_item), None)).replace("[[wikidata:", "")
+
+            municipio_ID = str(municipio_ID).replace("]]", "")
+
+            # Etapa 3: caso o item ainda não exista (conforme verificado na etapa 2), criá-lo        
                 
-                # Nesta variável (array), vamos armazenar as informações que gostaríamos de adicionar em nosso item
+            # Nesta variável (array), vamos armazenar as informações que gostaríamos de adicionar em nosso item
             dados = {
                 'labels': {
                 'en':  nome,
@@ -196,7 +192,7 @@ with open(arquivo_fonte, newline='', encoding='utf-8') as arquivo_csv:
                 }
             }
     
-                #Essa variavel vai nos ajudar a corrigir o bug do valor "Escola"        
+            #Essa variavel vai nos ajudar a corrigir o bug do valor "Escola"        
             mapa_tipo_escola = {
                 '1': "Q134739441",
                 '2': "Q134739026",
@@ -205,17 +201,17 @@ with open(arquivo_fonte, newline='', encoding='utf-8') as arquivo_csv:
                 '0-2': "Q19855165",    # localizacaoDiferenciada=0 e localizacao=2
             }
     
-                # Gera chave combinada para os casos especiais
+            # Gera chave combinada para os casos especiais
             chave = (
                 f"{localizacao_diferenciada}-{localizacao}"
                 if localizacao_diferenciada == '0'
                 else localizacao_diferenciada
             )
     
-                # Busca no dicionário, ou retorna None se não existir
+            # Busca no dicionário, ou retorna None se não existir
             tipo_escola = mapa_tipo_escola.get(chave)
                 
-                #Verifica se queima ou separa o lixo
+            #Verifica se queima ou separa o lixo
             if queima_lixo == '1':
                 queima_lixo_ID = 'Q133235'
             else:
@@ -245,8 +241,7 @@ with open(arquivo_fonte, newline='', encoding='utf-8') as arquivo_csv:
                     esgoto_fossa_septica_ID = 'Q386300'
     
                 if esgoto_rede == '1':
-                    esgoto_rede_ID = 'Q156849'
-                        
+                    esgoto_rede_ID = 'Q156849'      
     
             energia_publica_ID = None
             energia_gerador_ID = None
@@ -274,15 +269,14 @@ with open(arquivo_fonte, newline='', encoding='utf-8') as arquivo_csv:
             # Criar o item com labels e descrições
             #item.editEntity(dados, summary='Criando item para escola brasileira - Censo Escolar 2023')
 
-            # Adicionar município (P131), se encontrado
-            #if municipio_ID:
-            #    adicionar_declaracao(item, 'P131', municipio_ID)
-
             # Adicionar "instância de" (P31) = tipo_escola
             #adicionar_declaracao(item, 'P31', tipo_escola)
 
             # Adicionar "país" (P17) = Brasil (Q155)
             #adicionar_declaracao(item, 'P17', 'Q155')
+
+            # Adicionar município (P131)
+            #adicionar_declaracao(item, 'P131', municipio_ID)
 
             # Adicionar "Código INEP" (P11704) = código da escola (string)
             #adicionar_declaracao(item, 'P11704', codigo_inep, valor_tipo='string')
@@ -293,10 +287,8 @@ with open(arquivo_fonte, newline='', encoding='utf-8') as arquivo_csv:
             #    prop_id='P912',      #Instalações
             #    valor='Q180388',     #Gestão de resíduos sólidos
             #    qualificadores=[
-            #        ('P1552', queimaLixo_ID),
-            #        ('P1552', separaLixo_ID),
-            #        (esgotoProp, esgoto_ID)
-            
+            #        ('P1552', queima_lixo_ID),
+            #        ('P1552', separa_lixo_ID)           
             #    ]
             #)
 
@@ -323,4 +315,5 @@ with open(arquivo_fonte, newline='', encoding='utf-8') as arquivo_csv:
             #        ('P1552', energia_renovavel_ID)
             #    ]
             #)
+
             #print(f'Item criado para a escola {nome} (código INEP: {codigo_inep})')
