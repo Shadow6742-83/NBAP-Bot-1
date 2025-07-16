@@ -112,6 +112,7 @@ import pywikibot
 # para processar datas no formato do Wikidata
 from pywikibot import pagegenerators, WbTime
 
+
 # Vamos utilizar essa biblioteca para ler o arquivo fonte, que está salvo no formato csv
 import csv
 
@@ -148,23 +149,33 @@ with open(arquivo_fonte, newline='', encoding='utf-8') as arquivo_csv:
         esgoto_fossa_comum = linha['IN_ESGOTO_FOSSA_COMUM']
         esgoto_fossa_septica = linha['IN_ESGOTO_FOSSA_SEPTICA']
         esgoto_rede = linha['IN_ESGOTO_REDE_PUBLICA']
-        
+        energia_inexistente = linha['IN_ENERGIA_INEXISTENTE']
+        energia_publica = linha['IN_ENERGIA_REDE_PUBLICA']
+        energia_gerador = linha['IN_ENERGIA_GERADOR_FOSSIL']
+        energia_renovavel = linha['IN_ENERGIA_RENOVAVEL']
         # Final da Etapa 1
         
         # Etapa 2: realizar a consulta para verificar e existência (ou não) de um item
 
         # Nesta variável, vamos armazenar nossa query
         consulta = "SELECT ?item ?itemLabel  WHERE { ?item wdt:P31 wd:Q3914 . ?item wdt:P11704 '" + codigo_inep + "' . }"
+        consulta_municipio = "select ?item where{ ?item wdt:P1585 '"+ codigo_municipio +"'  . }"
 
+        
+ 
+                
         # Definindo o site (wikidata)
         site = pywikibot.Site("wikidata", "wikidata")
         repo = site.data_repository()
-        
+
+        municipioItem = pagegenerators.WikidataSPARQLPageGenerator(consulta_municipio,site=site)
         # Checando se existe um item ou não
         if any(pagegenerators.WikidataSPARQLPageGenerator(consulta, site=site)):
-            print(f"A escola {nome} já existe no Wikidata. Prosseguindo para a próxima.")
+           print(f"A escola {nome} já existe no Wikidata. Prosseguindo para a próxima.")
         else:
             print(f"A escola {nome} ainda não existe no Wikidata. Prosseguindo para criação do item.")
+
+            
             # Etapa 3: caso o item ainda não exista (conforme verificado na etapa 2), criá-lo        
 
             # Nesta variável (array), vamos armazenar as informações que gostaríamos de adicionar em nosso item
@@ -229,7 +240,28 @@ with open(arquivo_fonte, newline='', encoding='utf-8') as arquivo_csv:
 
                 if esgoto_rede == '1':
                     esgoto_rede_ID = 'Q156849'
-    
+                    
+
+            energia_publica_ID = None
+            energia_gerador_ID = None
+            energia_renovavel_ID = None
+            
+            if energia_inexistente == '1':
+                energia_prop = 'P6477'
+
+            elif energia_inexistente == '0':
+                energia_prop = 'P912'
+
+                if energia_publica == '1':
+                    energia_publica_ID = 'Q1096907'
+                
+                if energia_gerador == '1':
+                    energia_gerador_ID = 'Q135343942'
+
+                if energia_renovavel == '1':
+                    energia_renovavel_ID = 'Q12705'
+                
+            print(F"Nome: {nome}, Tipos de energia: {energia_publica_ID}, {energia_gerador_ID}, {energia_renovavel_ID}.")
             # Criar um novo item vazio
             #item = pywikibot.ItemPage(repo)
 
@@ -251,8 +283,10 @@ with open(arquivo_fonte, newline='', encoding='utf-8') as arquivo_csv:
             #    prop_id='P912',      #Instalações
             #    valor='Q180388',     #Gestão de resíduos sólidos
             #    qualificadores=[
-            #        ('P1552', queima_lixo_ID),
-            #        ('P1552', separa_lixo_ID)
+            #        ('P1552', queimaLixo_ID),
+            #        ('P1552', separaLixo_ID),
+            #        (esgotoProp, esgoto_ID)
+            
             #    ]
             #)
 
@@ -265,6 +299,18 @@ with open(arquivo_fonte, newline='', encoding='utf-8') as arquivo_csv:
             #        ('P1552', esgoto_fossa_comum_ID),
             #        ('P1552', esgoto_fossa_septica_ID),
             #        ('P1552', esgoto_rede_ID)
+            #    ]
+            #)
+
+            # Adicionando as informações de Energia Elétrica
+            #adicionar_declaracao(
+            #    item = item,
+            #    prop_id = energia_prop,
+            #    valor = 'Q206799',
+            #    qualificadores=[
+            #        ('P1552', energia_publica_ID),
+            #        ('P1552', energia_gerador_ID),
+            #        ('P1552', energia_renovavel_ID)
             #    ]
             #)
             #print(f'Item criado para a escola {nome} (código INEP: {codigo_inep})')
