@@ -320,14 +320,16 @@ with open(arquivo_fonte, newline='', encoding='utf-8') as arquivo_csv:
             #adicionar_declaracao(
             #    item = item,
             #    prop_id = 'P2196',       # propriedade "número de alunos" no Wikidata
-            #    valor = estudantes,
+            #    valor = int(estudantes),
+            #    valor_tipo = 'quantity'
             #)
 
             # Adicionando quantidade de professores
             #adicionar_declaracao(
             #    item = item,
             #    prop_id = 'P10610',       # propriedade "número de professores" no Wikidata
-            #    valor = professores,
+            #    valor = int(professores),
+            #    valor_tipo = 'quantity'
             #)
 
             #print(f'Item criado para a escola {nome} (código INEP: {codigo_inep})')
