@@ -19,6 +19,13 @@ def adicionar_declaracao(item, prop_id, valor, valor_tipo='wikibase-item', quali
         declaracao.setTarget(target)
     elif valor_tipo == 'string':
         declaracao.setTarget(str(valor))
+    elif valor_tipo == 'coordinate':
+        declaracao.setTarget(pywikibot.Coordinate(
+            lat=valor['latitude'],
+            lon=valor['longitude'],
+            precision=0.0001
+            )
+        )
     else:
         raise ValueError('Tipo de valor não suportado')
     
@@ -156,6 +163,8 @@ with open(arquivo_fonte, newline='', encoding='utf-8') as arquivo_csv:
         energia_publica = linha['IN_ENERGIA_REDE_PUBLICA']
         energia_gerador = linha['IN_ENERGIA_GERADOR_FOSSIL']
         energia_renovavel = linha['IN_ENERGIA_RENOVAVEL']
+        coordenadas_latitude = linha['COORDENADAS_LAT']
+        coordenadas_longitude = linha['COORDENADAS_LON']
         # Final da Etapa 1
         
         # Etapa 2: realizar a consulta para verificar e existência (ou não) de um item
@@ -331,5 +340,17 @@ with open(arquivo_fonte, newline='', encoding='utf-8') as arquivo_csv:
             #    valor = int(professores),
             #    valor_tipo = 'quantity'
             #)
+
+            # Adicionando dados sobre coordenadas
+            #if coordenadas_latitude and coordenadas_longitude:
+            #    adicionar_declaracao(
+            #        item = item,
+            #        prop_id = 'P625',
+            #        valor = {
+            #            'latitude': coordenadas_latitude,
+            #            'longitude': coordenadas_longitude
+            #        },
+            #        valor_tipo = 'coordinate'
+            #    )
 
             #print(f'Item criado para a escola {nome} (código INEP: {codigo_inep})')
