@@ -26,6 +26,14 @@ def adicionar_declaracao(item, prop_id, valor, valor_tipo='wikibase-item', quali
             precision=0.0001
             )
         )
+    elif valor_tipo == 'quantity':
+        declaracao.setTarget(pywikibot.WbQuantity(
+            amount=valor,
+            site=site
+            )
+        )
+    elif valor_tipo == 'time':
+        declaracao.setTarget(valor)
     else:
         raise ValueError('Tipo de valor não suportado')
     
@@ -34,12 +42,36 @@ def adicionar_declaracao(item, prop_id, valor, valor_tipo='wikibase-item', quali
 
     # Adiciona os Qualificadores
     if qualificadores:
-        for prop_q, val_q in qualificadores:
+        for prop_q, val_q, type_q in qualificadores:
             if val_q is None:
                 continue #pula se o valor não existir
+
             qual = pywikibot.Claim(repo, prop_q)
-            qual.setTarget(pywikibot.ItemPage(repo, val_q))
-            declaracao.addQualifier(qual, summary=f'Adicionando qualificador {prop_id} -> {val_q}')
+
+            if type_q == 'wikibase-item':
+                target = pywikibot.ItemPage(repo, val_q)
+                qual.setTarget(target)
+            elif type_q == 'string':
+                qual.setTarget(str(val_q))
+            elif type_q == 'coordinate':
+                qual.setTarget(pywikibot.Coordinate(
+                    lat=val_q['latitude'],
+                    lon=val_q['longitude'],
+                    precision=0.0001
+                )
+            )
+            elif type_q == 'quantity':
+                qual.setTarget(pywikibot.WbQuantity(
+                    amount=val_q,
+                    site=site
+                )
+            )
+            elif type_q == 'time':
+                qual.setTarget(val_q)
+            else:
+                raise ValueError('Tipo de valor não suportado')
+
+            declaracao.addQualifier(qual, summary=f'Adicionando qualificador {prop_q} -> {val_q}')
         
     # Adiciona sempre a mesma referência (Censo Escolar 2023, com a mesma data de acesso)
     # Adiciona referência: P248 (afirmado em) → Q133805362
@@ -269,8 +301,7 @@ with open(arquivo_fonte, newline='', encoding='utf-8') as arquivo_csv:
                     energia_gerador_ID = 'Q135343942'
     
                 if energia_renovavel == '1':
-                    energia_renovavel_ID = 'Q12705'
-                
+                    energia_renovavel_ID = 'Q12705'    
             
             # Criar um novo item vazio
             #item = pywikibot.ItemPage(repo)
@@ -296,8 +327,8 @@ with open(arquivo_fonte, newline='', encoding='utf-8') as arquivo_csv:
             #    prop_id='P912',      #Instalações
             #    valor='Q180388',     #Gestão de resíduos sólidos
             #    qualificadores=[
-            #        ('P1552', queima_lixo_ID),
-            #        ('P1552', separa_lixo_ID)           
+            #        ('P1552', queima_lixo_ID, 'wikibase-item'),
+            #        ('P1552', separa_lixo_ID, 'wikibase-item')           
             #    ]
             #)
 
@@ -307,9 +338,9 @@ with open(arquivo_fonte, newline='', encoding='utf-8') as arquivo_csv:
             #    prop_id = esgoto_prop,
             #    valor = 'Q20127660',
             #    qualificadores=[
-            #        ('P1552', esgoto_fossa_comum_ID),
-            #        ('P1552', esgoto_fossa_septica_ID),
-            #        ('P1552', esgoto_rede_ID)
+            #        ('P1552', esgoto_fossa_comum_ID, 'wikibase-item'),
+            #        ('P1552', esgoto_fossa_septica_ID, 'wikibase-item'),
+            #        ('P1552', esgoto_rede_ID, 'wikibase-item')
             #    ]
             #)
 
@@ -319,9 +350,9 @@ with open(arquivo_fonte, newline='', encoding='utf-8') as arquivo_csv:
             #    prop_id = energia_prop,
             #    valor = 'Q206799',
             #    qualificadores=[
-            #        ('P1552', energia_publica_ID),
-            #        ('P1552', energia_gerador_ID),
-            #        ('P1552', energia_renovavel_ID)
+            #        ('P1552', energia_publica_ID, 'wikibase-item'),
+            #        ('P1552', energia_gerador_ID, 'wikibase-item'),
+            #        ('P1552', energia_renovavel_ID, 'wikibase-item')
             #    ]
             #)
 
@@ -330,7 +361,10 @@ with open(arquivo_fonte, newline='', encoding='utf-8') as arquivo_csv:
             #    item = item,
             #    prop_id = 'P2196',       # propriedade "número de alunos" no Wikidata
             #    valor = int(estudantes),
-            #    valor_tipo = 'quantity'
+            #    valor_tipo = 'quantity',
+            #    qualificadores=[
+            #        ('P585', pywikibot.WbTime(year=2023, precision=9), 'time')
+            #    ]
             #)
 
             # Adicionando quantidade de professores
@@ -338,7 +372,10 @@ with open(arquivo_fonte, newline='', encoding='utf-8') as arquivo_csv:
             #    item = item,
             #    prop_id = 'P10610',       # propriedade "número de professores" no Wikidata
             #    valor = int(professores),
-            #    valor_tipo = 'quantity'
+            #    valor_tipo = 'quantity',
+            #    qualificadores=[
+            #        ('P585', pywikibot.WbTime(year=2023, precision=9), 'time')
+            #    ]
             #)
 
             # Adicionando dados sobre coordenadas
