@@ -36,9 +36,6 @@ def adicionar_declaracao(item, prop_id, valor, valor_tipo='wikibase-item', quali
         declaracao.setTarget(valor)
     else:
         raise ValueError('Tipo de valor não suportado')
-    
-    # Adiciona a declaração ao item"
-    item.addClaim(declaracao, summary=f'Adicionado {prop_id} -> {valor}')
 
     # Adiciona os Qualificadores
     if qualificadores:
@@ -71,7 +68,7 @@ def adicionar_declaracao(item, prop_id, valor, valor_tipo='wikibase-item', quali
             else:
                 raise ValueError('Tipo de valor não suportado')
 
-            declaracao.addQualifier(qual, summary=f'Adicionando qualificador {prop_q} -> {val_q}')
+            declaracao.addQualifier(qual)
         
     # Adiciona sempre a mesma referência (Censo Escolar 2023, com a mesma data de acesso)
     # Adiciona referência: P248 (afirmado em) → Q133805362
@@ -86,6 +83,9 @@ def adicionar_declaracao(item, prop_id, valor, valor_tipo='wikibase-item', quali
         
     # Anexa as referências na declaração
     declaracao.addSources([ref_fonte, ref_data])
+
+    # Adiciona a declaração ao item"
+    item.addClaim(declaracao, summary=f'Criando escola (#WikiProjetoBrasilEscolas)')
 
 
 #Essa função é utilizada para formatar o nome das escolas,
