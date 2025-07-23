@@ -85,7 +85,7 @@ def adicionar_declaracao(item, prop_id, valor, valor_tipo='wikibase-item', quali
     declaracao.addSources([ref_fonte, ref_data])
 
     # Adiciona a declaração ao item"
-    item.addClaim(declaracao, summary=f'Criando escola (#WikiProjetoBrasilEscolas)')
+    item.addClaim(declaracao, summary=f'adicionando propriedades, referências e qualificadores ([[v:pt:Geografia para professores/Projeto Wikidata na Escola|Projeto Wikidata na Escola]] - [[Wikidata:WikiProject Brasil Escolas|WikiProjeto Brasil Escolas]])')
 
 
 #Essa função é utilizada para formatar o nome das escolas,
@@ -304,90 +304,90 @@ with open(arquivo_fonte, newline='', encoding='utf-8') as arquivo_csv:
                     energia_renovavel_ID = 'Q12705'    
             
             # Criar um novo item vazio
-            #item = pywikibot.ItemPage(repo)
+            item = pywikibot.ItemPage(repo)
 
             # Criar o item com labels e descrições
-            #item.editEntity(dados, summary='Criando item para escola brasileira - Censo Escolar 2023')
+            item.editEntity(dados, summary=f'criando item sobre escola ([[v:pt:Geografia para professores/Projeto Wikidata na Escola|Projeto Wikidata na Escola]] - [[Wikidata:WikiProject Brasil Escolas|WikiProjeto Brasil Escolas]])')
 
             # Adicionar "instância de" (P31) = tipo_escola
-            #adicionar_declaracao(item, 'P31', tipo_escola)
+            adicionar_declaracao(item, 'P31', tipo_escola)
 
             # Adicionar "país" (P17) = Brasil (Q155)
-            #adicionar_declaracao(item, 'P17', 'Q155')
+            adicionar_declaracao(item, 'P17', 'Q155')
 
             # Adicionar município (P131)
-            #adicionar_declaracao(item, 'P131', municipio_ID)
+            adicionar_declaracao(item, 'P131', municipio_ID)
 
             # Adicionar "Código INEP" (P11704) = código da escola (string)
-            #adicionar_declaracao(item, 'P11704', codigo_inep, valor_tipo='string')
+            adicionar_declaracao(item, 'P11704', codigo_inep, valor_tipo='string')
 
             # Adiciona as informações de tratamento de lixo
-            #adicionar_declaracao(
-            #    item = item,
-            #    prop_id='P912',      #Instalações
-            #    valor='Q180388',     #Gestão de resíduos sólidos
-            #    qualificadores=[
-            #        ('P1552', queima_lixo_ID, 'wikibase-item'),
-            #        ('P1552', separa_lixo_ID, 'wikibase-item')           
-            #    ]
-            #)
+            adicionar_declaracao(
+                item = item,
+                prop_id='P912',      #Instalações
+                valor='Q180388',     #Gestão de resíduos sólidos
+                qualificadores=[
+                    ('P1552', queima_lixo_ID, 'wikibase-item'),
+                    ('P1552', separa_lixo_ID, 'wikibase-item')           
+                ]
+            )
 
             # Adiciona as informações de Esgoto
-            #adicionar_declaracao(
-            #    item = item,
-            #    prop_id = esgoto_prop,
-            #    valor = 'Q20127660',
-            #    qualificadores=[
-            #        ('P1552', esgoto_fossa_comum_ID, 'wikibase-item'),
-            #        ('P1552', esgoto_fossa_septica_ID, 'wikibase-item'),
-            #        ('P1552', esgoto_rede_ID, 'wikibase-item')
-            #    ]
-            #)
+            adicionar_declaracao(
+                item = item,
+                prop_id = esgoto_prop,
+                valor = 'Q20127660',
+                qualificadores=[
+                    ('P1552', esgoto_fossa_comum_ID, 'wikibase-item'),
+                    ('P1552', esgoto_fossa_septica_ID, 'wikibase-item'),
+                    ('P1552', esgoto_rede_ID, 'wikibase-item')
+                ]
+            )
 
             # Adicionando as informações de Energia Elétrica
-            #adicionar_declaracao(
-            #    item = item,
-            #    prop_id = energia_prop,
-            #    valor = 'Q206799',
-            #    qualificadores=[
-            #        ('P1552', energia_publica_ID, 'wikibase-item'),
-            #        ('P1552', energia_gerador_ID, 'wikibase-item'),
-            #        ('P1552', energia_renovavel_ID, 'wikibase-item')
-            #    ]
-            #)
+            adicionar_declaracao(
+                item = item,
+                prop_id = energia_prop,
+                valor = 'Q206799',
+                qualificadores=[
+                    ('P1552', energia_publica_ID, 'wikibase-item'),
+                    ('P1552', energia_gerador_ID, 'wikibase-item'),
+                    ('P1552', energia_renovavel_ID, 'wikibase-item')
+                ]
+            )
 
             # Adicionando quantidade de estudantes
-            #adicionar_declaracao(
-            #    item = item,
-            #    prop_id = 'P2196',       # propriedade "número de alunos" no Wikidata
-            #    valor = int(estudantes),
-            #    valor_tipo = 'quantity',
-            #    qualificadores=[
-            #        ('P585', pywikibot.WbTime(year=2023, precision=9), 'time')
-            #    ]
-            #)
+            adicionar_declaracao(
+                item = item,
+                prop_id = 'P2196',       # propriedade "número de alunos" no Wikidata
+                valor = int(estudantes),
+                valor_tipo = 'quantity',
+                qualificadores=[
+                    ('P585', pywikibot.WbTime(year=2023, precision=9), 'time')
+                ]
+            )
 
             # Adicionando quantidade de professores
-            #adicionar_declaracao(
-            #    item = item,
-            #    prop_id = 'P10610',       # propriedade "número de professores" no Wikidata
-            #    valor = int(professores),
-            #    valor_tipo = 'quantity',
-            #    qualificadores=[
-            #        ('P585', pywikibot.WbTime(year=2023, precision=9), 'time')
-            #    ]
-            #)
+            adicionar_declaracao(
+                item = item,
+                prop_id = 'P10610',       # propriedade "número de professores" no Wikidata
+                valor = int(professores),
+                valor_tipo = 'quantity',
+                qualificadores=[
+                    ('P585', pywikibot.WbTime(year=2023, precision=9), 'time')
+                ]
+            )
 
             # Adicionando dados sobre coordenadas
-            #if coordenadas_latitude and coordenadas_longitude:
-            #    adicionar_declaracao(
-            #        item = item,
-            #        prop_id = 'P625',
-            #        valor = {
-            #            'latitude': coordenadas_latitude,
-            #            'longitude': coordenadas_longitude
-            #        },
-            #        valor_tipo = 'coordinate'
-            #    )
+            if coordenadas_latitude and coordenadas_longitude:
+                adicionar_declaracao(
+                    item = item,
+                    prop_id = 'P625',
+                    valor = {
+                        'latitude': coordenadas_latitude,
+                        'longitude': coordenadas_longitude
+                    },
+                    valor_tipo = 'coordinate'
+                )
 
-            #print(f'Item criado para a escola {nome} (código INEP: {codigo_inep})')
+            print(f'Item criado para a escola {nome} (código INEP: {codigo_inep})')
