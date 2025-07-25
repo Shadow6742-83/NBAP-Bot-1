@@ -157,12 +157,11 @@ import csv
 # Etapa 1: obter os dados da escola de um arquivo fonte
 
 # Definindo qual é o arquivo fonte (com os dados que iremos importar)
-arquivo_fonte = 'microdados_ed_basica_2023_sc_resumido.csv'
 
 # Definindo o site (wikidata)
 site = pywikibot.Site("wikidata", "wikidata")
 repo = site.data_repository()
-site.user_agent = "NBAP 0.8"
+site.user_agent = "NBAP 1.0"
 # Precisamos que o programa abra o arquivo fonte, e armazene seu conteúdo em uma variável para que possamos usá-lo
 # Nesse caso, a variável será arquivoCsv
 with open(arquivo_fonte, newline='', encoding='utf-8') as arquivo_csv:
@@ -357,26 +356,28 @@ with open(arquivo_fonte, newline='', encoding='utf-8') as arquivo_csv:
             )
 
             # Adicionando quantidade de estudantes
-            adicionar_declaracao(
-                item = item,
-                prop_id = 'P2196',       # propriedade "número de alunos" no Wikidata
-                valor = int(estudantes),
-                valor_tipo = 'quantity',
-                qualificadores=[
-                    ('P585', pywikibot.WbTime(year=2023, precision=9), 'time')
-                ]
-            )
+            if estudantes:
+                adicionar_declaracao(
+                    item = item,
+                    prop_id = 'P2196',       # propriedade "número de alunos" no Wikidata
+                    valor = int(estudantes),
+                    valor_tipo = 'quantity',
+                    qualificadores=[
+                        ('P585', pywikibot.WbTime(year=2023, precision=9), 'time')
+                    ]
+                )
 
             # Adicionando quantidade de professores
-            adicionar_declaracao(
-                item = item,
-                prop_id = 'P10610',       # propriedade "número de professores" no Wikidata
-                valor = int(professores),
-                valor_tipo = 'quantity',
-                qualificadores=[
-                    ('P585', pywikibot.WbTime(year=2023, precision=9), 'time')
-                ]
-            )
+            if professores:
+                adicionar_declaracao(
+                    item = item,
+                    prop_id = 'P10610',       # propriedade "número de professores" no Wikidata
+                    valor = int(professores),
+                    valor_tipo = 'quantity',
+                    qualificadores=[
+                        ('P585', pywikibot.WbTime(year=2023, precision=9), 'time')
+                    ]
+                )      
 
             # Adicionando dados sobre coordenadas
             if coordenadas_latitude and coordenadas_longitude:
