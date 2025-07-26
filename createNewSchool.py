@@ -157,6 +157,7 @@ import csv
 # Etapa 1: obter os dados da escola de um arquivo fonte
 
 # Definindo qual é o arquivo fonte (com os dados que iremos importar)
+arquivo_fonte = 'microdados_ed_basica_2023_sc_resumido.csv'
 
 # Definindo o site (wikidata)
 site = pywikibot.Site("wikidata", "wikidata")
